@@ -3,4 +3,11 @@ this is boring ong
 
 OMG
 lolololo
+<<<<<<< Updated upstream
 hagoat
+=======
+so lost
+
+
+it works? sometimes?
+>>>>>>> Stashed changes
