@@ -9,7 +9,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-## Data
+## Data Tada
 
 ```{r lala}
 ueq <- read.csv('UEQ_Two-Products (1).csv', sep = ";")
