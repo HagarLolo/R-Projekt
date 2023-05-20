@@ -1,0 +1,39 @@
+---
+title: "yooooo"
+output: html_document
+date: "2023-05-20"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, language = "R")
+```
+
+## R Markdown
+
+
+```{r lalalala}
+ueq <- read.csv('UEQ_Two-Products.csv', sep = ";") #2c
+head(ueq$wertvoll_minderwertig, 4) #3g
+
+subsetProdukt1 <- ueq[ueq$Produkt == 1, ] #3h
+subsetProdukt2 <- ueq[ueq$Produkt == 2, ]
+durchschnittProdukt1 <- mean(subsetProdukt1$gut_schlecht)
+durchschnittProdukt2 <- mean(subsetProdukt2$gut_schlecht)
+durchschnittProdukt1
+durchschnittProdukt2
+
+
+colnames(ueq)[colnames(ueq) == "sicher_unsicher"] <- "safe_unsafe" #4a
+#ueq
+
+geschlecht <- rep(c("männlich", "weiblich", "divers", "keine Angabe"), times = c(75, 82, 9, 31)) #4bi
+geschlecht <- sample(geschlecht) #4bii
+geschlechtFaktor <- factor(geschlecht) #4biii
+ueq$geschlecht <- geschlechtFaktor #4biv
+#ueq
+
+#install.packages("knitr", dependencies = TRUE)
+library(knitr)
+kable(table(ueq$geschlecht)) #4bv
+```
+
