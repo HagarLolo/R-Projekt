@@ -1,0 +1,39 @@
+---
+title: "uebung3"
+author: "flooo2"
+date: "2023-06-15"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(knitr)
+library(dplyr)
+
+ueq <- read.csv('UEQ_Two-Products.csv', sep = ";")
+
+tabellee <- select(ueq, unerfreulich_erfreulich, unverständlich_verständlich, Produkt)
+
+tabellee <- tabellee %>%
+  mutate(wie_erfreulich = ifelse(unerfreulich_erfreulich < 3, "(eher) unerfreulich",
+                                ifelse(unerfreulich_erfreulich == 3, "neutral", "(eher) erfreulich")))
+
+wie_erfreulich <- factor(ueq$wie_erfreulich, levels = c("(eher) unerfreulich", "neutral", "(eher) erfreulich")) #eig unnötig
+
+tabellee <- tabellee %>%
+  filter(!is.na(unverständlich_verständlich)) %>% #filtert NA
+  group_by(Produkt, wie_erfreulich) %>%
+  summarize(
+    mean = mean(unverständlich_verständlich), 
+    median = median(unverständlich_verständlich),
+    min = min(unverständlich_verständlich),
+    max = max(unverständlich_verständlich),
+  ) %>%
+  arrange(mean, .by_group = TRUE) #sortiert
+
+colnames(tabellee) <- c("Produkt", "Erfreulichkeit", "Verständlichkeit (mean)", "Verständlichkeit (median)", "Verständlichkeit (min)", "Verständlichkeit (max)")
+kable(tabellee, caption = "Tabelle 2: Zusammenhang zwischen der Erfreulichkeit und Verständlichkeit von Produkt X.") 
+```
