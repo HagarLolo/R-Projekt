@@ -1,0 +1,51 @@
+title: "uebung4"
+author: "flooo2"
+date: "2023-07-01"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(knitr)
+library(dplyr)
+
+ueq <- read.csv('UEQ_Two-Products.csv', sep = ";")
+
+ueq <- ueq %>%
+  filter(!is.na(gut_schlecht), !is.na(abstoßend_anziehend), !is.na(unangenehm_angenehm), !is.na(attraktiv_unattraktiv), !is.na(sympathisch_unsympathisch), !is.na(kreativ_phantasielos), !is.na(originell_konventionell), !is.na(herkömmlich_neuartig), !is.na(konservativ_innovativ)) %>% #macht na weg
+  mutate(
+    att = (unerfreulich_erfreulich + gut_schlecht + abstoßend_anziehend + unangenehm_angenehm + attraktiv_unattraktiv + sympathisch_unsympathisch) / 6, #attraktivität
+    Produkt.cat = factor(ifelse(Produkt == 1, "Produkt 1", "Produkt 2")), #für ggplot
+    neu = (kreativ_phantasielos + originell_konventionell + herkömmlich_neuartig + konservativ_innovativ) / 4 #neuartigkeit
+  )
+
+#berechnet dinge, sind genau die gleichen werte wie in abbildung 2.1, sieht man im environment
+m1 <- mean(ueq$att[ueq$Produkt == 1]) 
+m2 <- mean(ueq$att[ueq$Produkt == 2])
+sd1 <- sd(ueq$att[ueq$Produkt == 1])
+sd2 <- sd(ueq$att[ueq$Produkt == 2])
+
+t <- t.test(ueq$att[ueq$Produkt == 1], ueq$att[ueq$Produkt == 2])
+ta <- t$parameter
+ts <- t$statistic
+tp <- t$p.value
+
+#abbildung 2.2
+c <- cor.test(ueq$neu, ueq$att)
+ca <- c$parameter
+ce <- c$estimate
+cp <- c$p.value
+```
+
+```{r}
+library(ggplot2)
+
+plot_data <- ueq %>%
+  select(att, Produkt.cat)
+#TODO
+```
+
