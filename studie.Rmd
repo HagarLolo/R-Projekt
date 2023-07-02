@@ -1,0 +1,50 @@
+---
+title: "studie"
+author: "flooo2"
+date: "2023-07-02"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(dplyr)
+
+data <- read.csv("results-survey768925.csv")
+
+#es wird eine neue tabelle erstellt, dinge werden umbenannt, b steht für bereal und i für instagram
+data_neu <- data %>%
+  mutate(geschlecht = case_when(
+             Mit.welchem.Geschlecht.identifizierst.du.dich. == "männlich" ~ "m",
+             Mit.welchem.Geschlecht.identifizierst.du.dich. == "weiblich" ~ "w",
+             TRUE ~ Mit.welchem.Geschlecht.identifizierst.du.dich.
+           )) %>%
+  mutate(b_nutzung = case_when(
+             Denk.an.die.letzten.drei.Monate.zurück..Wie.regelmäßig.hast.du.ein.BeReal.hochgeladen.. == "täglich" ~ 6,
+             Denk.an.die.letzten.drei.Monate.zurück..Wie.regelmäßig.hast.du.ein.BeReal.hochgeladen.. == "mehrmals wöchentlich" ~ 5,
+             Denk.an.die.letzten.drei.Monate.zurück..Wie.regelmäßig.hast.du.ein.BeReal.hochgeladen.. == "einmal wöchentlich" ~ 4,
+             Denk.an.die.letzten.drei.Monate.zurück..Wie.regelmäßig.hast.du.ein.BeReal.hochgeladen.. == "mehrmals monatlich" ~ 3,
+             Denk.an.die.letzten.drei.Monate.zurück..Wie.regelmäßig.hast.du.ein.BeReal.hochgeladen.. == "einmal monatlich" ~ 2,
+             Denk.an.die.letzten.drei.Monate.zurück..Wie.regelmäßig.hast.du.ein.BeReal.hochgeladen.. == "weniger als einmal monatlich" ~ 1,
+             Denk.an.die.letzten.drei.Monate.zurück..Wie.regelmäßig.hast.du.ein.BeReal.hochgeladen.. == "ich benutze BeReal nicht" ~ 0,
+             TRUE ~ NA_integer_
+           )) %>%
+  select(geschlecht, b_nutzung)
+```
+
+```{r}
+N <- nrow(data)
+M_alter <- mean(data$Wie.alt.bist.du., na.rm = TRUE)
+n_w <- sum(data$Mit.welchem.Geschlecht.identifizierst.du.dich. == "weiblich", na.rm = TRUE)
+n_m <- sum(data$Mit.welchem.Geschlecht.identifizierst.du.dich. == "männlich", na.rm = TRUE)
+
+#mir egal, ob wir generell zwischen geschlechtern unterscheiden wollen; wollte nur schauen, wie das geht; wahrscheinlich aber schon?
+M_w_b_nutzung <- mean(data_neu$b_nutzung[data_neu$geschlecht == "w"], na.rm = TRUE)
+M_m_b_nutzung <- mean(data_neu$b_nutzung[data_neu$geschlecht == "m"], na.rm = TRUE)
+M_b_nutzung <- mean(data_neu$b_nutzung, na.rm = TRUE)
+```
+
+
+
