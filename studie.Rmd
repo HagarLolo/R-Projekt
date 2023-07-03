@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 library(dplyr)
 
-data <- read.csv("results-survey768925.csv")
+data <- read.csv("results-survey768925neu.csv")
 
 #es wird eine neue tabelle erstellt, dinge werden umbenannt, b steht für bereal und i für instagram
 data_neu <- data %>%
@@ -31,20 +31,59 @@ data_neu <- data %>%
              Denk.an.die.letzten.drei.Monate.zurück..Wie.regelmäßig.hast.du.ein.BeReal.hochgeladen.. == "ich benutze BeReal nicht" ~ 0,
              TRUE ~ NA_integer_
            )) %>%
-  select(geschlecht, b_nutzung)
+  mutate(i_nutzung = case_when(
+             Denk.an.die.letzten.drei.Monate.zurück..Wie.regelmäßig.hast.du.ein.Instagram.Post.hochgeladen.. == "täglich" ~ 6,
+             Denk.an.die.letzten.drei.Monate.zurück..Wie.regelmäßig.hast.du.ein.Instagram.Post.hochgeladen.. == "mehrmals wöchentlich" ~ 5,
+             Denk.an.die.letzten.drei.Monate.zurück..Wie.regelmäßig.hast.du.ein.Instagram.Post.hochgeladen.. == "einmal wöchentlich" ~ 4,
+             Denk.an.die.letzten.drei.Monate.zurück..Wie.regelmäßig.hast.du.ein.Instagram.Post.hochgeladen.. == "mehrmals monatlich" ~ 3,
+             Denk.an.die.letzten.drei.Monate.zurück..Wie.regelmäßig.hast.du.ein.Instagram.Post.hochgeladen.. == "einmal monatlich" ~ 2,
+             Denk.an.die.letzten.drei.Monate.zurück..Wie.regelmäßig.hast.du.ein.Instagram.Post.hochgeladen.. == "weniger als einmal monatlich" ~ 1,
+             Denk.an.die.letzten.drei.Monate.zurück..Wie.regelmäßig.hast.du.ein.Instagram.Post.hochgeladen.. == "ich benutze Instagram nicht" ~ 0,
+             TRUE ~ NA_integer_
+           )) %>%
+  select(geschlecht, b_nutzung, i_nutzung)
+
+data_neu2 <- data %>%
+  mutate(across(everything(), ~case_when(
+             . == "stimmt gar nicht" ~ 0,
+             . == "stimmt weitgehend nicht" ~ 1,
+             . == "stimmt eher nicht" ~ 2,
+             . == "stimmt eher" ~ 3,
+             . == "stimmt weitgehend" ~ 4,
+             . == "stimmt völlig" ~ 5,
+             TRUE ~ NA_integer_
+           )))
 ```
 
 ```{r}
 N <- nrow(data)
 M_alter <- mean(data$Wie.alt.bist.du., na.rm = TRUE)
+SD_alter <- sd(data$Wie.alt.bist.du., na.rm = TRUE)
 n_w <- sum(data$Mit.welchem.Geschlecht.identifizierst.du.dich. == "weiblich", na.rm = TRUE)
 n_m <- sum(data$Mit.welchem.Geschlecht.identifizierst.du.dich. == "männlich", na.rm = TRUE)
 
-#mir egal, ob wir generell zwischen geschlechtern unterscheiden wollen; wollte nur schauen, wie das geht; wahrscheinlich aber schon?
+#mir egal, ob wir generell zwischen geschlechtern unterscheiden wollen; wollte nur schauen, wie das geht; wahrscheinlich nur bei vielen teilnehmern?
 M_w_b_nutzung <- mean(data_neu$b_nutzung[data_neu$geschlecht == "w"], na.rm = TRUE)
 M_m_b_nutzung <- mean(data_neu$b_nutzung[data_neu$geschlecht == "m"], na.rm = TRUE)
 M_b_nutzung <- mean(data_neu$b_nutzung, na.rm = TRUE)
+SD_b_nutzung <- sd(data_neu$b_nutzung, na.rm = TRUE)
+M_w_i_nutzung <- mean(data_neu$i_nutzung[data_neu$geschlecht == "w"], na.rm = TRUE)
+M_m_i_nutzung <- mean(data_neu$i_nutzung[data_neu$geschlecht == "m"], na.rm = TRUE)
+M_i_nutzung <- mean(data_neu$i_nutzung, na.rm = TRUE)
+SD_i_nutzung <- sd(data_neu$i_nutzung, na.rm = TRUE)
+
+#keine ahnung welche frage zu b oder i gehört
+M_b_leben <- mean(data_neu2$X..Es.ist.mir.wichtig..dass.meine.Follower.wissen..wie.mein.Leben.aussieht.., na.rm = TRUE)
+M_i_leben <- mean(data_neu2$X..Es.ist.mir.wichtig..dass.meine.Follower.wissen..wie.mein.Leben.aussieht...1, na.rm = TRUE)
+
+#das gleiche wie in der übung, keine ahnung was die werte bedeuten; glaube voraussetzung ist normalverteilung, müsste man wahrscheinlich noch überprüfen
+t_leben <- t.test(data_neu2$X..Es.ist.mir.wichtig..dass.meine.Follower.wissen..wie.mein.Leben.aussieht.., data_neu2$X..Es.ist.mir.wichtig..dass.meine.Follower.wissen..wie.mein.Leben.aussieht...1)
+t_leben_a <- t_leben$parameter
+t_leben_s <- t_leben$statistic
+t_leben_p <- t_leben$p.value
+
+c_leben <- cor.test(data_neu2$X..Es.ist.mir.wichtig..dass.meine.Follower.wissen..wie.mein.Leben.aussieht.., data_neu2$X..Es.ist.mir.wichtig..dass.meine.Follower.wissen..wie.mein.Leben.aussieht...1)
+c_leben_a <- c_leben$parameter
+c_leben_e <- c_leben$estimate
+c_leben_p <- c_leben$p.value
 ```
-
-
-
