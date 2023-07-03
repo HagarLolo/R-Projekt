@@ -19,6 +19,7 @@ data_neu <- data %>%
   mutate(geschlecht = case_when(
              Mit.welchem.Geschlecht.identifizierst.du.dich. == "männlich" ~ "m",
              Mit.welchem.Geschlecht.identifizierst.du.dich. == "weiblich" ~ "w",
+              Mit.welchem.Geschlecht.identifizierst.du.dich. == "nicht binär" ~ "nb",
              TRUE ~ Mit.welchem.Geschlecht.identifizierst.du.dich.
            )) %>%
   mutate(b_nutzung = case_when(
@@ -61,6 +62,7 @@ M_alter <- mean(data$Wie.alt.bist.du., na.rm = TRUE)
 SD_alter <- sd(data$Wie.alt.bist.du., na.rm = TRUE)
 n_w <- sum(data$Mit.welchem.Geschlecht.identifizierst.du.dich. == "weiblich", na.rm = TRUE)
 n_m <- sum(data$Mit.welchem.Geschlecht.identifizierst.du.dich. == "männlich", na.rm = TRUE)
+n_nb <- sum(data$Mit.welchem.Geschlecht.identifizierst.du.dich. == "nicht binär", na.rm = TRUE)
 
 #mir egal, ob wir generell zwischen geschlechtern unterscheiden wollen; wollte nur schauen, wie das geht; wahrscheinlich nur bei vielen teilnehmern?
 M_w_b_nutzung <- mean(data_neu$b_nutzung[data_neu$geschlecht == "w"], na.rm = TRUE)
@@ -75,6 +77,35 @@ SD_i_nutzung <- sd(data_neu$i_nutzung, na.rm = TRUE)
 #keine ahnung welche frage zu b oder i gehört
 M_b_leben <- mean(data_neu2$X..Es.ist.mir.wichtig..dass.meine.Follower.wissen..wie.mein.Leben.aussieht.., na.rm = TRUE)
 M_i_leben <- mean(data_neu2$X..Es.ist.mir.wichtig..dass.meine.Follower.wissen..wie.mein.Leben.aussieht...1, na.rm = TRUE)
+M_b_erleben <- mean(data_neu2$X..Wenn.ich.etwas.tolles.erlebe..hoffe.ich..dass.ich.es.teilen.kann.., na.rm = TRUE)
+M_i_erleben <- mean(data_neu2$X..Wenn.ich.etwas.tolles.erlebe..hoffe.ich..dass.ich.es.teilen.kann...1, na.rm = TRUE)
+M_b_erleben2 <- mean(data_neu2$X..Ich.ärgere.mich..wenn.ich.etwas.tolles.erlebe..was.ich.nicht.mehr.posten.kann.., na.rm = TRUE)
+M_i_erleben2 <- mean(data_neu2$X..Ich.ärgere.mich..wenn.ich.etwas.tolles.erlebe..was.ich.nicht.mehr.posten.kann...1, na.rm = TRUE)
+M_b_repraesentieren <- mean(data_neu2$X..Meine.Bilder.repräsentieren.mich.und.meine.Persönlichkeit.., na.rm = TRUE)
+M_i_repraesentieren <- mean(data_neu2$X..Meine.Bilder.repräsentieren.mich.und.meine.Persönlichkeit...1)
+M_b_festhalten <- mean(data_neu2$X..Ich.möchte.Erlebnisse.sofort.festhalten..egal.wie.ich.aussehe.., na.rm = TRUE)
+M_i_festhalten <- mean(data_neu2$X..Ich.möchte.Erlebnisse.sofort.festhalten..egal.wie.ich.aussehe...1, na.rm = TRUE)
+M_b_gesicht <- mean(data_neu2$X..Im.Großteil.meiner.Bilder.kann.man.mein.Gesicht.sehen.., na.rm = TRUE)
+M_i_gesicht <- mean(data_neu2$X..Im.Großteil.meiner.Bilder.kann.man.mein.Gesicht.sehen...1, na.rm = TRUE)
+M_b_perfekt <- mean(data_neu2$X..Ich.habe.ein.Problem.damit..ein.für.mich.nicht.perfektes.Bild.zu.veröffentlichen.., na.rm = TRUE)
+M_i_perfekt <- mean(data_neu2$X..Ich.habe.ein.Problem.damit..ein.für.mich.nicht.perfektes.Bild.zu.veröffentlichen..., na.rm = TRUE)
+M_b_take <- mean(data_neu2$X..Ich.brauche.durchschnittlich..mehr.als.ein.Take..um.ein.Bild.zu.machen.., na.rm = TRUE)
+M_i_take <- mean(data_neu2$X..Ich.brauche.durchschnittlich..mehr.als.ein.Take..um.ein.Bild.zu.machen..., na.rm = TRUE)
+
+#social media
+M_1 <- mean(data_neu2$X..Wenn.Leute.Fotos.von.mir.machen..denke.ich.daran..wie.ich.aussehe..wenn.die.Bilder.auf.Social.Media.veröffentlicht.werden.., na.rm = TRUE)
+M_2 <- mean(data_neu2$X..Ich.denke.darüber.nach..wie.bestimmte.Teile.meines.Körpers.aussehen.werden..wenn.die.Leute.meine.Bilder.in.den.sozialen.Medien.sehen.., na.rm = TRUE)
+M_3 <- mean(data_neu2$X..Selbst.wenn.ich.allein.bin..stelle.ich.mir.vor..wie.mein.Körper.auf.einem.Bild..auf.Social.Media.aussehen.würde.., na.rm = TRUE)
+M_4 <- mean(data_neu2$X..Tagsüber.verbringe.ich.Zeit.damit..darüber.nachzudenken..wie.attraktiv.ich.aussehe..wenn.andere.Leute.Bilder.von.mir.auf.Social.Media.sehen.., na.rm = TRUE)
+M_5 <- mean(data_neu2$X..Ich.versuche.zu.erraten..wie.die.Leute.in.den.sozialen.Medien.auf.meine.körperliche.Erscheinung.auf.meinen.Bildern.reagieren.werden.., na.rm = TRUE)
+M_6 <- mean(data_neu2$X..Meine.Attraktivität.auf.Bildern.ist.wichtiger.als.alles.andere..was.ich..auf.Social.Media.tue.., na.rm = TRUE)
+M_7 <- mean(data_neu2$X..Wenn.ich.zu.gesellschaftlichen.Veranstaltungen.gehe..ist.es.mir.wichtiger..auf.den.Bildern..die.die.Leute.auf.Social.Media.posten.könnten..attraktiv.auszusehen..als.mich.zu.amüsieren.., na.rm = TRUE)
+M_8 <- mean(data_neu2$X..Wenn.ein.unattraktives.Bild.von.mir.in.den.sozialen.Medien.gepostet.wird..fühle.ich.mich.nicht.wohl.in.meiner.Haut.., na.rm = TRUE)
+M_9 <- mean(data_neu2$X..Ich.schaue.mir.immer.wieder.Bilder.von.mir.auf.Social.Media.an..., na.rm = TRUE)
+M_10 <- mean(data_neu2$X..Ich.zoome.in.Social.Media.Bilder..um.zu.sehen..wie.bestimmte.Teile.meines.Körpers.aussehen.., na.rm = TRUE)
+M_11 <- mean(data_neu2$X..Wenn.jemand.ein.Foto.von.mir.macht..das.in.den.sozialen.Medien.veröffentlicht.werden.könnte..bitte.ich.darum..es.mir.zuerst.anzusehen..um.sicherzustellen..dass.ich.gut.aussehe.., na.rm = TRUE)
+M_12 <- mean(data_neu2$X..Bevor.ich.Bilder.in.sozialen.Medien.poste..schneide.ich.sie.zu.oder.wende.Filter.an..um.mich.besser.aussehen.zu.lassen.., na.rm = TRUE)
+M_13 <- mean(data_neu2$X..Wenn.jemand.ein.Foto.von.mir.macht..das..auf.Social.Media.veröffentlicht.werden.könnte..stelle.ich.mich.in.eine.bestimmte.Pose..damit.ich.so.attraktiv.wie.möglich.aussehe..., na.rm = TRUE)
 
 #das gleiche wie in der übung, keine ahnung was die werte bedeuten; glaube voraussetzung ist normalverteilung, müsste man wahrscheinlich noch überprüfen
 t_leben <- t.test(data_neu2$X..Es.ist.mir.wichtig..dass.meine.Follower.wissen..wie.mein.Leben.aussieht.., data_neu2$X..Es.ist.mir.wichtig..dass.meine.Follower.wissen..wie.mein.Leben.aussieht...1)
