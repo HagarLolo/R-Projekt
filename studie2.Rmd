@@ -1,0 +1,78 @@
+---
+title: "studie2"
+author: "flooo2"
+date: "2023-07-05"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+data <- read.csv("results-survey768925juli5.csv")
+```
+```{r}
+#allgemeine fragen
+N <- nrow(data)
+M_alter <- mean(data$Of1)
+SD_alter <- sd(data$Of1)
+n_w <- sum(data$Of2 == "w")
+n_m <- sum(data$Of2 == "m")
+#mir egal, ob wir generell zwischen geschlechtern unterscheiden wollen; wollte nur schauen, wie das geht; wahrscheinlich nur bei vielen teilnehmern?
+M_w_b_nutzung <- mean(data$Of3[data$Of2 == "w"])
+M_m_b_nutzung <- mean(data$Of3[data$Of2 == "m"])
+M_b_nutzung <- mean(data$Of3)
+SD_b_nutzung <- sd(data$Of3)
+M_w_i_nutzung <- mean(data$Of4[data$Of2 == "w"])
+M_m_i_nutzung <- mean(data$Of4[data$Of2 == "m"])
+M_i_nutzung <- mean(data$Of4)
+SD_i_nutzung <- sd(data$Of4)
+privat <- sum(data$Of5 == "p")
+oeffentlich <-sum(data$Of5 == "o")
+```
+
+```{r}
+#b = bereal, i = instagram, s = social media
+data_b <- data[, grepl("^Bf", names(data))]
+data_i <- data[, grepl("^If", names(data))]
+data_s <- data[, grepl("^Af", names(data))]
+data_bis <- cbind(data_b, data_i, data_s)
+
+#sollten wir anscheinend gar nicht tun
+M_bis <- colMeans(data_bis, na.rm = TRUE)
+Mdn_bis <- apply(data_bis, 2, median, na.rm = TRUE)
+SD_bis <- apply(data_bis, 2, sd, na.rm = TRUE)
+result_table <- data.frame(Frage = colnames(data_bis),
+                           M = M_bis,
+                           Mdn = Mdn_bis,
+                           SD = SD_bis)
+```
+
+```{r}
+data_b <- na.omit(data_b) #na wird entfernt, nicht alle bekommen alle fragen
+data_i <- na.omit(data_i)
+data_s <- na.omit(data_s)
+
+#das sollten wir tun, weiß aber nicht, ob das bei b und i sinn macht, die skala haben wir uns ja selber ausgedacht...
+data_b$M <- rowMeans(data_b[, grep("^Bf\\.b[1-8]\\.", colnames(data_b))])
+data_i$M <- rowMeans(data_i[, grep("^If\\.i[1-8]\\.", colnames(data_i))])
+data_s$M <- rowMeans(data_s[, grep("^Af\\.a[1-13]\\.", colnames(data_s))])
+
+#das gleiche wie in der übung, keine ahnung was die werte bedeuten; glaube voraussetzung ist normalverteilung, müsste man wahrscheinlich noch überprüfen
+t_bs <- t.test(data_b$M, data_s$M)
+t_bs_a <- t_bs$parameter
+t_bs_s <- t_bs$statistic
+t_bs_p <- t_bs$p.value
+
+
+t_is <- t.test(data_i$M, data_s$M)
+t_is_a <- t_is$parameter
+t_is_s <- t_is$statistic
+t_is_p <- t_is$p.value
+
+c_is <- cor.test(data_i$M, data_s$M)
+c_is_a <- c_is$parameter
+c_is_e <- c_is$estimate
+c_is_p <- c_is$p.value
+```
