@@ -11,6 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 data <- read.csv("results-survey768925juli5.csv")
+data <- data[!is.na(data$Bf.b1.), ]
 ```
 ```{r}
 #allgemeine fragen
@@ -43,36 +44,72 @@ data_bis <- cbind(data_b, data_i, data_s)
 M_bis <- colMeans(data_bis, na.rm = TRUE)
 Mdn_bis <- apply(data_bis, 2, median, na.rm = TRUE)
 SD_bis <- apply(data_bis, 2, sd, na.rm = TRUE)
-result_table <- data.frame(Frage = colnames(data_bis),
-                           M = M_bis,
+M_Mdn_SD <- data.frame(M = M_bis,
                            Mdn = Mdn_bis,
                            SD = SD_bis)
 ```
 
 ```{r}
-data_b <- na.omit(data_b) #na wird entfernt, nicht alle bekommen alle fragen
-data_i <- na.omit(data_i)
-data_s <- na.omit(data_s)
-
 #das sollten wir tun, weiß aber nicht, ob das bei b und i sinn macht, die skala haben wir uns ja selber ausgedacht...
-data_b$M <- rowMeans(data_b[, grep("^Bf\\.b[1-8]\\.", colnames(data_b))])
-data_i$M <- rowMeans(data_i[, grep("^If\\.i[1-8]\\.", colnames(data_i))])
-data_s$M <- rowMeans(data_s[, grep("^Af\\.a[1-13]\\.", colnames(data_s))])
+data_b$M <- rowMeans(data_b)
+data_i$M <- rowMeans(data_i)
+data_s$M <- rowMeans(data_s)
 
-#das gleiche wie in der übung, keine ahnung was die werte bedeuten; glaube voraussetzung ist normalverteilung, müsste man wahrscheinlich noch überprüfen
-t_bs <- t.test(data_b$M, data_s$M)
-t_bs_a <- t_bs$parameter
-t_bs_s <- t_bs$statistic
-t_bs_p <- t_bs$p.value
+#mourad
+t_bi <- t.test(data_b$M, data_i$M) #5
+t_bi_a <- t_bi$parameter 
+t_bi_s <- t_bi$statistic
+t_bi_p <- t_bi$p.value 
+#eig sind die unteren 3 zeilen unnötig, man kann im environment auf t_bi klicken; war in der übung auch so, die werte sind wahrscheinlich wichtig
 
 
-t_is <- t.test(data_i$M, data_s$M)
-t_is_a <- t_is$parameter
-t_is_s <- t_is$statistic
-t_is_p <- t_is$p.value
+c_bs <- cor.test(data_b$M, data_s$M) #6.1
+c_bs_a <- c_bs$parameter
+c_bs_e <- c_bs$estimate
+c_bs_p <- c_bs$p.value
 
-c_is <- cor.test(data_i$M, data_s$M)
+c_is <- cor.test(data_i$M, data_s$M) #6.2
 c_is_a <- c_is$parameter
 c_is_e <- c_is$estimate
 c_is_p <- c_is$p.value
+
+M_bi = (data_b$M + data_i$M) / 2 #6.3
+c_bis <- cor.test(M_bi, data_s$M) 
+c_bis_a <- c_bis$parameter
+c_bis_e <- c_bis$estimate
+c_bis_p <- c_bis$p.value
 ```
+
+```{r}
+library(ggplot2)
+
+ggplot(data_i, aes(x = M)) +
+geom_bar()
+  
+ggplot(data_b, aes(x = M)) +
+geom_bar()
+  
+ggplot(data_s, aes(x = M)) +
+geom_bar()
+  
+
+#wunderschön
+beides = (data_b$M + data_i$M) / 2
+cor_result <- cor.test(data_s$M, beides)
+c <- t.test(data_i$M, data_b$M)
+
+result_df <- data.frame(
+  Variable = c("x", "y"),
+  Correlation = cor_result$estimate,
+  PValue = cor_result$p.value
+)
+
+ggplot(data = result_df, aes( y = Correlation, x = PValue)) +
+  geom_bar(stat = "identity", color = "black") +
+  geom_text(aes(label = PValue), vjust = -0.5, color = "white") +
+  labs(x = "Variable", y = "Correlation", fill = "P-Value") +
+  scale_fill_gradient(low = "green", high = "red") +
+  ggtitle("Correlation Analysis")
+```
+
+
