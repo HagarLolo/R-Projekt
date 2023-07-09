@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
-data <- read.csv("results-survey768925juli5.csv")
+data <- read.csv("results-survey768925juli9.csv")
 data <- data[!is.na(data$Bf.b1.), ]
 ```
 ```{r}
@@ -81,6 +81,52 @@ c_bis_p <- c_bis$p.value
 ```
 
 ```{r}
+#voraussetzungen für die tests von eben
+#normalverteilt
+qqnorm(rowMeans(data_b))
+qqline(rowMeans(data_b))
+
+qqnorm(rowMeans(data_i))
+qqline(rowMeans(data_i))
+
+qqnorm(rowMeans(data_s))
+qqline(rowMeans(data_s))
+
+
+#linearer zusammenhang
+plot(data_b$M, data_i$M, 
+     main = "Scatter Plot", 
+     xlab = "Variable in data_b", 
+     ylab = "Variable in data_i")
+
+plot(data_b$M, data_s$M, 
+     main = "Scatter Plot", 
+     xlab = "Variable in data_b", 
+     ylab = "Variable in data_s")
+
+plot(data_i$M, data_s$M, 
+     main = "Scatter Plot", 
+     xlab = "Variable in data_i", 
+     ylab = "Variable in data_s")
+
+
+#keine ausreißer
+means_b <- data.frame(M = rowMeans(data_b))
+model <- lm(M ~ 1, data = means_b)
+cooksd <- cooks.distance(model)
+plot(cooksd, pch = 20, main = "Cook's D Plot", xlab = "Observation", ylab = "Cook's D")
+
+means_i <- data.frame(M = rowMeans(data_i))
+model <- lm(M ~ 1, data = means_i)
+cooksd <- cooks.distance(model)
+plot(cooksd, pch = 20, main = "Cook's D Plot", xlab = "Observation", ylab = "Cook's D")
+
+means_s <- data.frame(M = rowMeans(data_s))
+model <- lm(M ~ 1, data = means_s)
+cooksd <- cooks.distance(model)
+plot(cooksd, pch = 20, main = "Cook's D Plot", xlab = "Observation", ylab = "Cook's D")
+```
+```{r}
 library(ggplot2)
 
 ggplot(data_i, aes(x = M)) +
@@ -111,5 +157,3 @@ ggplot(data = result_df, aes( y = Correlation, x = PValue)) +
   scale_fill_gradient(low = "green", high = "red") +
   ggtitle("Correlation Analysis")
 ```
-
-
