@@ -43,9 +43,21 @@ cp <- c$p.value
 
 ```{r}
 library(ggplot2)
-
-plot_data <- ueq %>%
-  select(att, Produkt.cat)
-#TODO
+plot_data <- ggplot(ueq, aes(x = neu, y = att, color = Produkt.cat)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, fullrange = TRUE, expand = c(0, 0)) +
+  scale_x_continuous(limits = c(1, 7), breaks = 1:7) +
+  scale_y_continuous(limits = c(1, 7), breaks = 1:7) +
+  labs(x = "Neu", y = "Attitude", title = "Scatterplot", 
+       subtitle = "Relationship between Neu and Attitude",
+       caption = "Data source: ueq") +
+  theme_minimal()
+plot_data
 ```
 
+
+```{r}
+ggplot(plot_data, aes(x = att, color = "Produkt 1")) +
+  geom_errorbar(aes(ymin = min, ymax = max)) +
+  geom_point(aes(y = dot))
+```

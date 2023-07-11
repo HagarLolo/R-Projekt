@@ -78,6 +78,12 @@ c_bis <- cor.test(M_bi, data_s$M)
 c_bis_a <- c_bis$parameter
 c_bis_e <- c_bis$estimate
 c_bis_p <- c_bis$p.value
+
+
+c_ib <- cor.test(data_i$M, data_b$M) #i und b
+c_ib_a <- c_ib$parameter
+c_ib_e <- c_ib$estimate
+c_ib_p <- c_ib$p.value
 ```
 
 ```{r}
@@ -128,32 +134,54 @@ plot(cooksd, pch = 20, main = "Cook's D Plot", xlab = "Observation", ylab = "Coo
 ```
 ```{r}
 library(ggplot2)
+merged_data <- data.frame(data_b$M, data_i$M, data_s$M)
+colnames(merged_data) <- c("b", "i", "s")
 
-ggplot(data_i, aes(x = M)) +
-geom_bar()
-  
-ggplot(data_b, aes(x = M)) +
-geom_bar()
-  
-ggplot(data_s, aes(x = M)) +
-geom_bar()
-  
+plot_data <- ggplot(merged_data, aes(x = b, y = i)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, fullrange = TRUE, expand = c(0, 0)) +
+  scale_x_continuous(limits = c(1, 7), breaks = 1:7) +
+  scale_y_continuous(limits = c(1, 7), breaks = 1:7) +
+  labs(x = "BeReal", y = "Instagram", title = "Scatterplot", 
+       subtitle = "Relationship between Neu and Attitude",
+       caption = "Data source: ueq") +
+  theme_minimal()
+plot_data
 
-#wunderschön
-beides = (data_b$M + data_i$M) / 2
-cor_result <- cor.test(data_s$M, beides)
-c <- t.test(data_i$M, data_b$M)
+plot_data <- ggplot(merged_data, aes(x = b, y = s)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, fullrange = TRUE, expand = c(0, 0)) +
+  scale_x_continuous(limits = c(1, 7), breaks = 1:7) +
+  scale_y_continuous(limits = c(1, 7), breaks = 1:7) +
+  labs(x = "BeReal", y = "Social Media", title = "Scatterplot", 
+       subtitle = "Relationship between Neu and Attitude",
+       caption = "Data source: ueq") +
+  theme_minimal()
+plot_data
 
-result_df <- data.frame(
-  Variable = c("x", "y"),
-  Correlation = cor_result$estimate,
-  PValue = cor_result$p.value
-)
 
-ggplot(data = result_df, aes( y = Correlation, x = PValue)) +
-  geom_bar(stat = "identity", color = "black") +
-  geom_text(aes(label = PValue), vjust = -0.5, color = "white") +
-  labs(x = "Variable", y = "Correlation", fill = "P-Value") +
-  scale_fill_gradient(low = "green", high = "red") +
-  ggtitle("Correlation Analysis")
+plot_data <- ggplot(merged_data, aes(x = i, y = s)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, fullrange = TRUE, expand = c(0, 0)) +
+  scale_x_continuous(limits = c(1, 7), breaks = 1:7) +
+  scale_y_continuous(limits = c(1, 7), breaks = 1:7) +
+  labs(x = "Instagram", y = "Social Media", title = "Scatterplot", 
+       subtitle = "Relationship between Neu and Attitude",
+       caption = "Data source: ueq") +
+  theme_minimal()
+plot_data
+
+
+plot_data <- ggplot() +
+  geom_point(data = merged_data, aes(x = b, y = s, color = "BeReal")) +
+  geom_smooth(data = merged_data, aes(x = b, y = s, color = "BeReal"), method = "lm", se = FALSE, fullrange = TRUE, expand = c(0, 0)) +
+  geom_point(data = merged_data, aes(x = i, y = s, color = "Instagram")) +
+  geom_smooth(data = merged_data, aes(x = i, y = s, color = "Instagram"), method = "lm", se = FALSE, fullrange = TRUE, expand = c(0, 0)) +
+  scale_x_continuous(limits = c(1, 7), breaks = 1:7) +
+  scale_y_continuous(limits = c(1, 7), breaks = 1:7) +
+  labs(x = "unsere Skala", y = "ASMC", title = "",
+       subtitle = "",
+       caption = "") +
+  theme_minimal()
+plot_data
 ```
