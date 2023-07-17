@@ -10,13 +10,14 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
-data <- read.csv("results-survey768925juli9.csv")
+data <- read.csv("results-survey768925juli13.csv")
 data <- data[!is.na(data$Bf.b1.), ]
 ```
 ```{r}
 #allgemeine fragen
 N <- nrow(data)
 M_alter <- mean(data$Of1)
+Mdn_alter <- median(data$Of1)
 SD_alter <- sd(data$Of1)
 n_w <- sum(data$Of2 == "w")
 n_m <- sum(data$Of2 == "m")
@@ -24,6 +25,8 @@ n_m <- sum(data$Of2 == "m")
 M_w_b_nutzung <- mean(data$Of3[data$Of2 == "w"])
 M_m_b_nutzung <- mean(data$Of3[data$Of2 == "m"])
 M_b_nutzung <- mean(data$Of3)
+median_bereal <- median(data$Of3)
+median_instagram <- median(data$Of4)
 SD_b_nutzung <- sd(data$Of3)
 M_w_i_nutzung <- mean(data$Of4[data$Of2 == "w"])
 M_m_i_nutzung <- mean(data$Of4[data$Of2 == "m"])
@@ -91,29 +94,35 @@ c_ib_p <- c_ib$p.value
 #normalverteilt
 qqnorm(rowMeans(data_b))
 qqline(rowMeans(data_b))
+mtext("BeReal", side = 3, line = 3, cex = 1.2)
 
 qqnorm(rowMeans(data_i))
 qqline(rowMeans(data_i))
+mtext("Instagram", side = 3, line = 3, cex = 1.2)
 
 qqnorm(rowMeans(data_s))
 qqline(rowMeans(data_s))
+mtext("ASMC", side = 3, line = 3, cex = 1.2)
 
 
 #linearer zusammenhang
 plot(data_b$M, data_i$M, 
      main = "Scatter Plot", 
-     xlab = "Variable in data_b", 
-     ylab = "Variable in data_i")
+     xlab = "BeReal", 
+     ylab = "Instagram")
+mtext("BeReal und Instagram", side = 3, line = 3, cex = 1.2)
 
 plot(data_b$M, data_s$M, 
      main = "Scatter Plot", 
-     xlab = "Variable in data_b", 
-     ylab = "Variable in data_s")
+     xlab = "BeReal", 
+     ylab = "ASMC")
+mtext("BeReal und ASMC", side = 3, line = 3, cex = 1.2)
 
 plot(data_i$M, data_s$M, 
      main = "Scatter Plot", 
-     xlab = "Variable in data_i", 
-     ylab = "Variable in data_s")
+     xlab = "Instagram", 
+     ylab = "ASMC")
+mtext("Instagram und ASMC", side = 3, line = 3, cex = 1.2)
 
 
 #keine ausreißer
@@ -121,22 +130,66 @@ means_b <- data.frame(M = rowMeans(data_b))
 model <- lm(M ~ 1, data = means_b)
 cooksd <- cooks.distance(model)
 plot(cooksd, pch = 20, main = "Cook's D Plot", xlab = "Observation", ylab = "Cook's D")
+mtext("BeReal", side = 3, line = 3, cex = 1.2)
 
 means_i <- data.frame(M = rowMeans(data_i))
 model <- lm(M ~ 1, data = means_i)
 cooksd <- cooks.distance(model)
 plot(cooksd, pch = 20, main = "Cook's D Plot", xlab = "Observation", ylab = "Cook's D")
+mtext("Instagram", side = 3, line = 3, cex = 1.2)
 
 means_s <- data.frame(M = rowMeans(data_s))
 model <- lm(M ~ 1, data = means_s)
 cooksd <- cooks.distance(model)
 plot(cooksd, pch = 20, main = "Cook's D Plot", xlab = "Observation", ylab = "Cook's D")
+mtext("ASMC", side = 3, line = 3, cex = 1.2)
+
+
+
+
+
+# Scatterplot BeReal vs. Instagram mit linearer Regression
+plot(data_b$M, data_i$M, 
+     main = "Scatter Plot", 
+     xlab = "BeReal", 
+     ylab = "Instagram")
+mtext("BeReal und Instagram", side = 3, line = 3, cex = 1.2)
+
+# Lineare Regression
+lm_model <- lm(data_i$M ~ data_b$M)
+abline(lm_model, col = "black")
+
+# Scatterplot BeReal vs. ASMC mit linearer Regression
+plot(data_b$M, data_s$M, 
+     main = "Scatter Plot", 
+     xlab = "BeReal", 
+     ylab = "ASMC")
+mtext("BeReal und ASMC", side = 3, line = 3, cex = 1.2)
+
+# Lineare Regression
+lm_model <- lm(data_s$M ~ data_b$M)
+abline(lm_model, col = "black")
+
+# Scatterplot Instagram vs. ASMC mit linearer Regression
+plot(data_i$M, data_s$M, 
+     main = "Scatter Plot", 
+     xlab = "Instagram", 
+     ylab = "ASMC")
+mtext("Instagram und ASMC", side = 3, line = 3, cex = 1.2)
+
+# Lineare Regression
+lm_model <- lm(data_s$M ~ data_i$M)
+abline(lm_model, col = "black")
+
 ```
 ```{r}
 library(ggplot2)
 merged_data <- data.frame(data_b$M, data_i$M, data_s$M)
 colnames(merged_data) <- c("b", "i", "s")
+merged_data$bi <- (merged_data$b + merged_data$i) / 2
+merged_data$Geschlecht <- data$Of2
 
+#b und i
 plot_data <- ggplot(merged_data, aes(x = b, y = i)) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE, fullrange = TRUE, expand = c(0, 0)) +
@@ -148,6 +201,7 @@ plot_data <- ggplot(merged_data, aes(x = b, y = i)) +
   theme_minimal()
 plot_data
 
+#b und s
 plot_data <- ggplot(merged_data, aes(x = b, y = s)) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE, fullrange = TRUE, expand = c(0, 0)) +
@@ -159,7 +213,7 @@ plot_data <- ggplot(merged_data, aes(x = b, y = s)) +
   theme_minimal()
 plot_data
 
-
+#i und s
 plot_data <- ggplot(merged_data, aes(x = i, y = s)) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE, fullrange = TRUE, expand = c(0, 0)) +
@@ -171,7 +225,7 @@ plot_data <- ggplot(merged_data, aes(x = i, y = s)) +
   theme_minimal()
 plot_data
 
-
+#b, i einzeln mit asmc
 plot_data <- ggplot() +
   geom_point(data = merged_data, aes(x = b, y = s, color = "BeReal")) +
   geom_smooth(data = merged_data, aes(x = b, y = s, color = "BeReal"), method = "lm", se = FALSE, fullrange = TRUE, expand = c(0, 0)) +
@@ -184,4 +238,74 @@ plot_data <- ggplot() +
        caption = "") +
   theme_minimal()
 plot_data
+
+
+#b, i zusammen mit asmc
+plot_data <- ggplot(merged_data, aes(x = bi, y = s)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, fullrange = TRUE, expand = c(0, 0)) +
+  scale_x_continuous(limits = c(1, 7), breaks = 1:7) +
+  scale_y_continuous(limits = c(1, 7), breaks = 1:7) +
+  labs(x = "(BeReal + Instagram) / 2", y = "Social Media", title = "Scatterplot", 
+       subtitle = "",
+       caption = "") +
+  theme_minimal()
+plot_data
+
+
+
+#alles
+plot_data <- ggplot() +
+  geom_point(data = merged_data, aes(x = b, y = s, color = "BeReal")) +
+  geom_smooth(data = merged_data, aes(x = b, y = s, color = "BeReal"), method = "lm", se = FALSE, fullrange = TRUE, expand = c(0, 0)) +
+  geom_point(data = merged_data, aes(x = i, y = s, color = "Instagram")) +
+  geom_smooth(data = merged_data, aes(x = i, y = s, color = "Instagram"), method = "lm", se = FALSE, fullrange = TRUE, expand = c(0, 0)) +
+  geom_point(data = merged_data, aes(x = bi, y = s, color = "Combined")) +
+  geom_smooth(data = merged_data, aes(x = bi, y = s, color = "Combined"), method = "lm", se = FALSE, fullrange = TRUE, expand = c(0, 0)) +
+  scale_x_continuous(limits = c(1, 7), breaks = 1:7) +
+  scale_y_continuous(limits = c(1, 7), breaks = 1:7) +
+  labs(x = "unsere Skala", y = "ASMC", title = "",
+       subtitle = "",
+       caption = "") +
+  theme_minimal() +
+  scale_color_manual(values = c("BeReal" = "red", "Instagram" = "blue", "Combined" = "green"))
+plot_data
+
+#m, w unterschieden mit b und s
+plot_data <- ggplot(merged_data, aes(x = b, y = s, color = Geschlecht)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, fullrange = TRUE, expand = c(0, 0)) +
+  scale_x_continuous(limits = c(1, 7), breaks = 1:7) +
+  scale_y_continuous(limits = c(1, 7), breaks = 1:7) +
+  labs(x = "BeReal", y = "ASMC", title = "", 
+       subtitle = "",
+       caption = "") +
+  theme_minimal()
+plot_data
+
+#m, w unterschieden mit i und s
+plot_data <- ggplot(merged_data, aes(x = i, y = s, color = Geschlecht)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, fullrange = TRUE, expand = c(0, 0)) +
+  scale_x_continuous(limits = c(1, 7), breaks = 1:7) +
+  scale_y_continuous(limits = c(1, 7), breaks = 1:7) +
+  labs(x = "Instagram", y = "ASMC", title = "", 
+       subtitle = "",
+       caption = "") +
+  theme_minimal()
+plot_data
+
+
+
+
+ggplot(merged_data, aes(x = "", y = b)) +
+  geom_boxplot() +
+  ylab("b") +
+  xlab("") +
+  theme_minimal()
+
+
+
+ggplot(merged_data, aes(x = "", y = b)) +
+       geom_boxplot()
 ```
